@@ -1,0 +1,3 @@
+event_id,sport,league,country,begin_timestamp,end_timestamp,participants,odds_home,odds_away
+a1,handball,extraliga,Czech Republic,2020-02-08T18:00:00,2099-01-01T00:00:00,"HC Zubri,HBC Ronal Jicin",2.50,3.40
+a2,football,premier league,England,2020-01-10T19:00:00,2020-01-10T21:00:00,"Chelsea,Arsenal",1.80,2.90

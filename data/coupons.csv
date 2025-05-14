@@ -1,0 +1,10 @@
+coupon_id,user_id,timestamp,stake,sport,league,company,selections
+c1,1,2025-05-01 14:05:00,40.8,football,premier league,Novibet,
+c2,2,2025-05-10 14:00:00,20.0,football,premier league,Novibet,
+c3,3,2025-05-12 12:00:00,25.0,handball,extraliga,Novibet,
+c4,5,2025-05-12 12:00:00,25.0,,,Novibet,"a1:3.50,a2:2.75"
+c5,6,2025-05-12 12:00:00,25.0,football,premier league,Novibet,
+c6,7,2025-05-12 12:00:00,25.0,football,premier league,Novibet,
+c7,8,2025-05-12 12:00:00,25.0,football,premier league,Novibet,
+c8,9,2025-05-12 12:00:00,25.0,football,premier league,Novibet,
+c9,10,2025-05-12 12:00:00,25.0,football,premier league,Novibet,
