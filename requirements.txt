@@ -1,3 +1,5 @@
 flask
 pydantic
 pytest
+pika
+mysql-connector-python

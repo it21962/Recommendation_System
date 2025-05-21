@@ -2,10 +2,12 @@ from flask import Flask, request, Response, jsonify
 from pydantic import ValidationError
 from app.schemas import UserRequest
 from app.recommender_registry import get_generator
-from .Generators import random_generator, frequent_generator, inference_generator
+from .Generators import inference_generator
 import json
 import pandas as pd
 from pathlib import Path
+from app.db_bill import get_dynamic_recommendations
+
 
 app = Flask(__name__)
 
@@ -45,7 +47,7 @@ def get_recommendations():
             mimetype="application/json"
         )
 
-# -------------------- GET /sync/<company> --------------------
+# GET Αίτημα
 @app.route("/sync/<company>", methods=["GET"])
 def sync_company_data(company):
     try:
@@ -75,3 +77,17 @@ def sync_company_data(company):
         return jsonify({"error": f"No data found for company '{company}'"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/recommendations", methods=["GET"])
+def fetch_dynamic_recommendations():
+    user_id = request.args.get("user_id", type=int)
+    if not user_id:
+        return jsonify({"error": "Missing user_id"}), 400
+
+    try:
+        recs = get_dynamic_recommendations(user_id)
+        return jsonify(recs)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    
