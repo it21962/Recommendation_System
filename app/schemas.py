@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class UserRequest(BaseModel):
     user_id: int
-    algorithm: str = "frequent"
+    algorithm: str = "inference"
     sport: str | None = None
 
 

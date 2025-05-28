@@ -1,7 +1,7 @@
 import mysql.connector
 
 def get_connection():
-    print("🔍 Connecting to DB as root")
+    print("Connecting to DB as root")
     return mysql.connector.connect(
         host="localhost",
         port=3306,
@@ -11,16 +11,23 @@ def get_connection():
     )
 
 
+import mysql.connector
+from mysql.connector import IntegrityError
+
 def insert_coupon(coupon):
     conn = get_connection()
     cursor = conn.cursor()
-    query = """
+
+    cursor.execute("SELECT 1 FROM coupons WHERE coupon_id = %s", (coupon.coupon_id,))
+    if cursor.fetchone():
+        cursor.close()
+        conn.close()
+        return False
+
+    query = '''
         INSERT INTO coupons (coupon_id, user_id, timestamp, stake, sport, league, company, selections)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-            stake=VALUES(stake), sport=VALUES(sport), league=VALUES(league),
-            company=VALUES(company), selections=VALUES(selections)
-    """
+    '''
     values = (
         coupon.coupon_id,
         coupon.user_id,
@@ -35,37 +42,53 @@ def insert_coupon(coupon):
     conn.commit()
     cursor.close()
     conn.close()
+    return True
+
 
 def insert_user(user):
     conn = get_connection()
     cursor = conn.cursor()
-    query = """
-        INSERT INTO users (user_id, name, birth_year, country, currency, gender, registration_date, company)
+
+    table = f"{user.company.lower()}_users"
+    cursor.execute(f"SELECT 1 FROM {table} WHERE user_id = %s", (user.user_id,))
+    if cursor.fetchone():
+        cursor.close()
+        conn.close()
+        return False
+
+    query = f'''
+        INSERT INTO {table} (user_id, name, birth_year, country, currency, gender, registration_date, company)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-            name=VALUES(name), birth_year=VALUES(birth_year), country=VALUES(country),
-            currency=VALUES(currency), gender=VALUES(gender),
-            registration_date=VALUES(registration_date), company=VALUES(company)
-    """
+    '''
     values = (
         user.user_id, user.name, user.birth_year, user.country, user.currency,
         user.gender, user.registration_date, user.company
     )
-    cursor.execute(query, values)
-    conn.commit()
-    cursor.close()
-    conn.close()
+
+    try:
+        cursor.execute(query, values)
+        conn.commit()
+        return True
+    except:
+        return False
+    finally:
+        cursor.close()
+        conn.close()
+
 
 def insert_event(event):
     conn = get_connection()
     cursor = conn.cursor()
+
+    cursor.execute("SELECT 1 FROM events WHERE event_id = %s", (event.event_id,))
+    if cursor.fetchone():
+        cursor.close()
+        conn.close()
+        return False
+
     query = """
         INSERT INTO events (event_id, sport, league, country, begin_timestamp, end_timestamp, participants, odds_home, odds_away)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-            sport=VALUES(sport), league=VALUES(league), country=VALUES(country),
-            begin_timestamp=VALUES(begin_timestamp), end_timestamp=VALUES(end_timestamp),
-            participants=VALUES(participants), odds_home=VALUES(odds_home), odds_away=VALUES(odds_away)
     """
     values = (
         event.event_id, event.sport, event.league, event.country,
@@ -76,12 +99,14 @@ def insert_event(event):
     conn.commit()
     cursor.close()
     conn.close()
+    return True
+
 
 def get_dynamic_recommendations(user_id: int):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Βρες τα sport/league που παίζει ο χρήστης
+    # sport / league που παίζει ο χρήστης
     cursor.execute("""
         SELECT DISTINCT sport, league
         FROM coupons
@@ -94,7 +119,7 @@ def get_dynamic_recommendations(user_id: int):
         conn.close()
         return []
 
-    #Query για να βρούμε events με ίδιο sport+league
+    #Query για να βρούμε events με ίδιο sport και league
     recommendations = []
     for interest in interests:
         cursor.execute("""
@@ -116,7 +141,53 @@ def get_dynamic_recommendations(user_id: int):
                 "user_id": user_id
             })
 
-
     cursor.close()
     conn.close()
     return recommendations
+
+import json
+
+def get_user_company(user_id: int):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    for table in ["novibet_users", "stoiximan_users"]:
+        cursor.execute(f"SELECT company FROM {table} WHERE user_id = %s", (user_id,))
+        result = cursor.fetchone()
+        if result:
+            cursor.close()
+            conn.close()
+            return result["company"]
+    cursor.close()
+    conn.close()
+    return None
+
+def get_display_config(company: str):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT config FROM company_configs WHERE company = %s", (company,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if result:
+        return json.loads(result["config"])
+    return {}
+
+def save_company_config(casino_id: int, config: dict):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    config_str = json.dumps(config)
+
+    # Αν υπάρχει ήδη, κάνε UPDATE, αλλιώς INSERT
+    cursor.execute("SELECT 1 FROM company_configs WHERE id = %s", (casino_id,))
+    exists = cursor.fetchone()
+
+    if exists:
+        cursor.execute("UPDATE company_configs SET config = %s WHERE id = %s", (config_str, casino_id))
+    else:
+        raise ValueError("Casino ID does not exist in company_configs")
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
