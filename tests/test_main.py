@@ -8,7 +8,7 @@ def client():
     with app.test_client() as client:
         yield client
 
-# === /recommendations [POST] ===
+#  /recommendations [POST] 
 
 def test_get_recommendations_invalid_algorithm(client):
     payload = {
@@ -40,7 +40,7 @@ def test_get_recommendations_success(mock_get_gen, client):
     assert response.status_code == 200
     assert isinstance(response.get_json(), list)
 
-# === /recommendations [GET] ===
+#  /recommendations [GET] 
 
 @patch("app.main.get_user_company")
 @patch("app.main.get_display_config")
@@ -66,7 +66,7 @@ def test_fetch_dynamic_recommendations_missing_user_id(client):
     assert response.status_code == 400
     assert "error" in response.get_json()
 
-# === /config [POST] ===
+#  /config [POST] 
 
 @patch("app.main.save_company_config")
 def test_set_config_success(mock_save, client):
@@ -100,7 +100,7 @@ def test_set_config_invalid_payload(client):
     response = client.post("/config", json={}, headers=headers)
     assert response.status_code == 400
 
-# === /config [GET] ===
+#  /config [GET] 
 
 def test_get_static_config(client):
     response = client.get("/config")

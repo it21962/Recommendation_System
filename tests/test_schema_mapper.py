@@ -6,7 +6,7 @@ from app.utils.schema_mapper import (
     generate_schema_from_config,
 )
 
-# -------- Tests for infer_field_type --------
+
 @pytest.mark.parametrize("field_name,expected_type", [
     ("user_id", "int"),
     ("session_id", "string"),
@@ -20,7 +20,6 @@ def test_infer_field_type(field_name, expected_type):
     assert infer_field_type(field_name) == expected_type
 
 
-# -------- Tests for generate_schema --------
 def test_generate_schema_with_label_map():
     fields_list = ["user_id", "home_team", "stake"]
     label_map = {"user_id": "uid", "home_team": "team", "stake": "bet_amount"}
@@ -35,7 +34,6 @@ def test_generate_schema_with_label_map():
     assert isinstance(schema.fields["stake"], fields.Float)
 
 
-# -------- Tests for generate_schema_from_config --------
 def test_generate_schema_from_config_with_source_fields():
     config = {
         "user_id": {"type": "int", "source_field": "uid"},

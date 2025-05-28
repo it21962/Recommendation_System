@@ -112,7 +112,7 @@ def test_no_stake_data_for_pair_raises_value_error(mock_datastore):
         }
     ])
 
-    # Προσποιούμαστε ότι το top_pair είναι αυτό χωρίς stake
+    # το top_pair είναι αυτό χωρίς stake
     mock_datastore.get_user_coupons.return_value = coupons_df
     mock_datastore.get_events_by_sport_league.side_effect = lambda sport, league: (
         events_df if sport == "basketball" and league == "nba" else pd.DataFrame()
