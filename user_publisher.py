@@ -7,8 +7,8 @@ from app.message_schemas.user import UserRegistered
 users = [
     UserRegistered(
         event_type="UserRegistered",
-        user_id=18,
-        name="Bill hrt",
+        user_id=20,
+        name="Bill hfee",
         birth_year=1997,
         country="GR",
         currency="EUR",
@@ -18,8 +18,8 @@ users = [
     ),
     UserRegistered(
         event_type="UserRegistered",
-        user_id=19,
-        name="Maria htrrth",
+        user_id=21,
+        name="Maria huojk",
         birth_year=1990,
         country="GR",
         currency="EUR",
