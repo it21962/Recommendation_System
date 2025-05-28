@@ -33,7 +33,7 @@
 - Database insertions
 - Validation (Pydantic, Marshmallow)
 
-**Προσωρινό Coverage:** 98%
+**Coverage:** 98%
 
 ## 5.RabbitMQ Integration
 ### Queues:
