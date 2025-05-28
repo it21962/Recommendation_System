@@ -2,4 +2,8 @@ flask
 pydantic
 pytest
 pika
+flask
+pydantic
+pytest
+pika
 mysql-connector-python
